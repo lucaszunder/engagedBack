@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:postgres@localhost:5433/engaged?schema=public"
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["createMany"]
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  name        String   @unique @db.VarChar(255)
+  description String 
+  createdAt   DateTime @default(now())
+  lessons     Lesson[]
+}
+
+model Lesson {
+  id        String    @id @default(uuid())
+  name      String
+  description String?
+  contents  Content[]
+  order     Int
+  Course    Course?   @relation(fields: [courseId], references: [id])
+  courseId  String?
+  createdAt DateTime  @default(now())
+}
+
+model Content {
+  id          String  @id @default(uuid())
+  title       String?
+  name        String
+  size        Int
+  type        String
+  Lesson      Lesson? @relation(fields: [lessonId], references: [id])
+  lessonId    String?
+}

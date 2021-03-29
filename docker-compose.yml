@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: .
+    container_name: backend-api
+    volumes:
+      - ./src:/app/src/
+    networks:
+      - app-network
+    ports:
+      - 3333:3333
+    command:  bash -c "
+      npx prisma generate
+      && npx prisma migrate dev --preview-feature
+      && npx prisma db seed --preview-feature
+      && yarn dev:server"    
+    restart: on-failure
+  db:
+    image: postgres
+    networks:
+      - app-network
+    environment:
+      POSTGRES_DB: 'engaged'
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+    ports:
+      - '5433:5432'
+networks:
+  app-network:
+    driver: bridge
